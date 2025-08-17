@@ -23,9 +23,6 @@
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial;
       color:var(--text); background:var(--bg);
     }
-    a{color:var(--blue); text-decoration:none}
-    a:hover{text-decoration:underline}
-
     .top{
       max-width:1120px; margin:24px auto 0; padding:0 20px;
       display:flex; align-items:center; gap:10px;
@@ -33,7 +30,6 @@
     .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px; color:#0f1b2d}
     .logo{width:40px; height:40px}
     .logo svg{display:block; width:100%; height:100%}
-
     .wrap{display:grid; place-items:center; padding:24px}
     .card{
       width:100%; max-width:1120px; background:var(--card); border:1px solid var(--border);
@@ -41,24 +37,17 @@
       display:grid; grid-template-columns:1.1fr 1fr; gap:56px;
     }
     @media (max-width: 960px){ .card{grid-template-columns:1fr; gap:28px; padding:28px 24px} }
-
     .big-title{
       font-size:clamp(28px,3.4vw,40px); line-height:1.1; margin:6px 0 14px;
       font-weight:700; letter-spacing:-.3px;
     }
     .lead{color:var(--muted); margin:0}
-
     form label{font-size:14px; color:var(--muted); margin:16px 0 6px; display:block}
     .field{
       width:100%; background:#fff; border:1px solid var(--border); border-radius:8px;
       padding:14px 12px; font-size:16px; outline:none; transition:border-color .15s ease, box-shadow .15s ease;
     }
     .field:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,115,232,.15)}
-    textarea.field{min-height:110px; resize:vertical}
-
-    .row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    @media (max-width: 520px){ .row-2{grid-template-columns:1fr} }
-
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:.6rem;
       background:var(--blue); color:#fff; font-weight:600; border:none; cursor:pointer;
@@ -68,19 +57,16 @@
     .btn:hover{background:var(--blue-600)}
     .btn:active{transform:translateY(1px)}
     .btn:disabled{opacity:.6; cursor:not-allowed}
-
     .status{
       margin-top:14px; font-size:14px; border:1px solid var(--border); border-radius:10px; padding:10px 12px;
       display:none; background:#fafbfd;
     }
     .status.ok{display:block; border-color:#cce8da; color:#136c3b; background:#eef8f3}
     .status.err{display:block; border-color:#f3d7d4; color:var(--error); background:#fef3f2}
-
     .trust-note{font-size:12px; color:var(--muted); margin-top:10px}
   </style>
 </head>
 <body>
-  <!-- Top / Logo -->
   <div class="top">
     <div class="brand" aria-label="UCADEMY">
       <div class="logo" aria-hidden="true">
@@ -98,7 +84,6 @@
     </div>
   </div>
 
-  <!-- Main Card -->
   <div class="wrap">
     <div class="card">
       <div>
@@ -107,7 +92,6 @@
           Regístrate con tu correo y recibe acceso inmediato al curso de regalo.
         </p>
       </div>
-
       <div>
         <form id="leadForm" method="POST" novalidate>
           <div class="row-2">
@@ -120,8 +104,11 @@
           <label for="email">Correo electrónico</label>
           <input class="field" id="email" name="email" type="email" placeholder="tucorreo@dominio.com" autocomplete="email" required />
 
+          <label for="phone">Teléfono (opcional)</label>
+          <input class="field" id="phone" name="phone" type="tel" placeholder="Ej: +34 600 123 456" autocomplete="tel" />
+
           <button class="btn" type="submit" id="sendBtn">Acceder al curso gratis</button>
-          <div class="trust-note">No compartimos tu correo. Puedes darte de baja en cualquier momento.</div>
+          <div class="trust-note">No compartimos tu correo ni teléfono. Puedes darte de baja en cualquier momento.</div>
           <div class="status" id="statusBox" role="alert" aria-live="polite"></div>
         </form>
       </div>
@@ -159,7 +146,7 @@
         }
 
         try{
-          const fd = new FormData(form); // incluye first_name y email
+          const fd = new FormData(form); // incluye first_name, email, phone
           const r = await fetch('/api/lead', { method:'POST', body:fd });
           const d = await r.json().catch(() => ({}));
 
