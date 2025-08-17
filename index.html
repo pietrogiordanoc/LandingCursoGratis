@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UCADEMY — Enviar mensaje y (opcional) foto</title>
-  <meta name="description" content="Formulario UCADEMY para enviar un mensaje y, si quieres, adjuntar una imagen (PNG/JPG/WEBP).">
+  <title>UCADEMY — Obtén tu curso gratis ahora</title>
+  <meta name="description" content="Regístrate con tu correo para recibir acceso inmediato a tu curso gratuito de UCADEMY.">
   <style>
     :root{
       --bg:#f7f9fc;
@@ -59,8 +59,6 @@
     .row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
     @media (max-width: 520px){ .row-2{grid-template-columns:1fr} }
 
-    .file-note{font-size:12px; color:var(--muted); margin-top:6px}
-
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:.6rem;
       background:var(--blue); color:#fff; font-weight:600; border:none; cursor:pointer;
@@ -78,10 +76,7 @@
     .status.ok{display:block; border-color:#cce8da; color:#136c3b; background:#eef8f3}
     .status.err{display:block; border-color:#f3d7d4; color:var(--error); background:#fef3f2}
 
-    .preview{
-      margin-top:10px; display:none; border:1px dashed var(--border); border-radius:10px; padding:8px; background:#fff;
-    }
-    .preview img{max-width:100%; border-radius:8px; display:block}
+    .trust-note{font-size:12px; color:var(--muted); margin-top:10px}
   </style>
 </head>
 <body>
@@ -107,40 +102,26 @@
   <div class="wrap">
     <div class="card">
       <div>
-        <h1 class="big-title">Usar un correo y (opcional) una imagen</h1>
+        <h1 class="big-title">Obtén tu curso gratis ahora</h1>
         <p class="lead">
-          Introduce tus datos, un mensaje y, si quieres, adjunta una foto (PNG/JPG/WEBP, máx. 5&nbsp;MB).
+          Regístrate con tu correo y recibe acceso inmediato al curso de regalo.
         </p>
       </div>
 
       <div>
-        <form id="photoForm" enctype="multipart/form-data" method="POST" novalidate>
+        <form id="leadForm" method="POST" novalidate>
           <div class="row-2">
             <div>
               <label for="first_name">Nombre (opcional)</label>
               <input class="field" id="first_name" name="first_name" type="text" placeholder="Tu nombre" autocomplete="given-name" />
             </div>
-            <div>
-              <label for="last_name">Apellido (opcional)</label>
-              <input class="field" id="last_name" name="last_name" type="text" placeholder="Tus apellidos" autocomplete="family-name" />
-            </div>
           </div>
 
-          <label for="email">Dirección de correo (opcional)</label>
-          <input class="field" id="email" name="email" type="email" placeholder="tucorreo@dominio.com" autocomplete="email" />
+          <label for="email">Correo electrónico</label>
+          <input class="field" id="email" name="email" type="email" placeholder="tucorreo@dominio.com" autocomplete="email" required />
 
-          <label for="message">Mensaje (opcional)</label>
-          <textarea class="field" id="message" name="message" placeholder="Escribe aquí…"></textarea>
-
-          <label for="photo">Imagen (opcional)</label>
-          <input class="field" id="photo" name="photo" type="file" accept="image/*" />
-          <div class="file-note">Solo si quieres. Tamaño máximo 5&nbsp;MB.</div>
-
-          <div class="preview" id="previewBox">
-            <img id="previewImg" alt="Vista previa de la imagen seleccionada">
-          </div>
-
-          <button class="btn" type="submit" id="sendBtn">Enviar</button>
+          <button class="btn" type="submit" id="sendBtn">Acceder al curso gratis</button>
+          <div class="trust-note">No compartimos tu correo. Puedes darte de baja en cualquier momento.</div>
           <div class="status" id="statusBox" role="alert" aria-live="polite"></div>
         </form>
       </div>
@@ -149,13 +130,10 @@
 
   <script>
     (function () {
-      const MAX_MB = 5;
-      const form = document.getElementById('photoForm');
+      const form = document.getElementById('leadForm');
       const statusBox = document.getElementById('statusBox');
       const btn = document.getElementById('sendBtn');
-      const fileInput = document.getElementById('photo');
-      const previewBox = document.getElementById('previewBox');
-      const previewImg = document.getElementById('previewImg');
+      const email = document.getElementById('email');
 
       function setStatus(ok, msg){
         statusBox.className = 'status ' + (ok ? 'ok' : 'err');
@@ -163,53 +141,33 @@
         statusBox.style.display = 'block';
       }
 
-      fileInput.addEventListener('change', () => {
-        const f = fileInput.files && fileInput.files[0];
-        previewBox.style.display = 'none';
-        if (!f) return;
-        if (!f.type.startsWith('image/')) {
-          setStatus(false, 'El archivo debe ser una imagen.');
-          fileInput.value = '';
-          return;
-        }
-        if (f.size > MAX_MB * 1024 * 1024) {
-          setStatus(false, 'La imagen supera el límite de ' + MAX_MB + ' MB.');
-          fileInput.value = '';
-          return;
-        }
-        const url = URL.createObjectURL(f);
-        previewImg.src = url;
-        previewBox.style.display = 'block';
-      });
+      function isValidEmail(v){
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      }
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusBox.style.display = 'none';
         btn.disabled = true;
 
-        try{
-          const f = fileInput.files && fileInput.files[0];
-          if (f) {
-            if (!f.type.startsWith('image/')) {
-              setStatus(false, 'El archivo debe ser una imagen.');
-              btn.disabled = false; return;
-            }
-            if (f.size > MAX_MB * 1024 * 1024) {
-              setStatus(false, 'La imagen supera el límite de ' + MAX_MB + ' MB.');
-              btn.disabled = false; return;
-            }
-          }
+        const emailVal = (email.value || '').trim();
+        if (!isValidEmail(emailVal)){
+          setStatus(false, 'Por favor, escribe un correo válido.');
+          btn.disabled = false;
+          email.focus();
+          return;
+        }
 
-          const fd = new FormData(form); // incluye first_name, last_name, email, message y photo
-          const r = await fetch('/api/send-photo', { method:'POST', body:fd });
+        try{
+          const fd = new FormData(form); // incluye first_name y email
+          const r = await fetch('/api/lead', { method:'POST', body:fd });
           const d = await r.json().catch(() => ({}));
 
           if (r.ok) {
-            setStatus(true, d.dryRun ? 'OK (prueba DRY_RUN): ' + JSON.stringify(d) : '¡Enviado! Revisa tu correo.');
+            setStatus(true, d.message || '¡Listo! Te enviamos un correo con el acceso.');
             form.reset();
-            previewBox.style.display = 'none';
           } else {
-            setStatus(false, d && d.error ? d.error : 'No se pudo enviar el correo.');
+            setStatus(false, d && d.error ? d.error : 'No se pudo registrar tu correo.');
           }
         } catch {
           setStatus(false, 'Error de red.');
